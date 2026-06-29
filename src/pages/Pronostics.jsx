@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { usePronostics } from '../usePronostics';
 import Logo from '../Logo';
@@ -197,7 +197,7 @@ function PaywallModal({ onClose }) {
         </p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
-          <Link to="/pronostics/abonnement" style={{
+          <Link to="/abonnement" style={{
             background: `linear-gradient(135deg, ${C.gold}, #ff8c00)`,
             color: '#000', borderRadius: 12, padding: '14px 20px',
             fontSize: 15, fontWeight: 900, textDecoration: 'none',
@@ -205,7 +205,7 @@ function PaywallModal({ onClose }) {
           }}>
             🚀 AI Plus — 4,99€/mois · Pronostics illimités
           </Link>
-          <Link to="/pronostics/abonnement" style={{
+          <Link to="/abonnement" style={{
             background: `linear-gradient(135deg, ${C.accent}, #c62828)`,
             color: '#fff', borderRadius: 12, padding: '14px 20px',
             fontSize: 15, fontWeight: 900, textDecoration: 'none',
@@ -267,13 +267,22 @@ function PronosticResult({ pronostic }) {
         ))}
       </div>
 
-      {pronostic.score_exact && (
+      {pronostic.score_exact ? (
         <div style={{
           textAlign: 'center', background: `${C.gold}10`,
           border: `1px solid ${C.gold}30`, borderRadius: 8, padding: '8px',
           fontSize: 13, color: C.gold, fontWeight: 800, marginBottom: 10
         }}>
           Score probable : {pronostic.score_exact}
+        </div>
+      ) : (
+        <div style={{
+          textAlign: 'center', background: 'rgba(255,255,255,0.03)',
+          border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '8px',
+          fontSize: 12, color: C.textDim, marginBottom: 10,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6
+        }}>
+          <span>🔒</span> Score exact réservé aux abonnés <strong style={{color: C.gold}}>AI Plus</strong>
         </div>
       )}
 
@@ -286,8 +295,129 @@ function PronosticResult({ pronostic }) {
   );
 }
 
+// ─── WRAPPER SECURISE LIVE IA COACH ─────────────────────────────────────────────
+function LiveIACoachWrapper({ matchId, match, pronosticsApi }) {
+  const [hasError, setHasError] = useState(false);
+  if (hasError) return null;
+  try {
+    return <LiveIACoachInline matchId={matchId} match={match} pronosticsApi={pronosticsApi} />;
+  } catch (e) {
+    console.error('LiveIACoach error:', e);
+    return null;
+  }
+}
+
+// ─── LIVE IA COACH INLINE ───────────────────────────────────────────────────
+function LiveIACoachInline({ matchId, match, pronosticsApi }) {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [sugLoading, setSugLoading] = useState(false);
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    // Charger les questions contextuelles au montage
+    setSugLoading(true);
+    pronosticsApi.get(`/pronostics/live/${matchId}/questions`)
+      .then(r => setSuggestions(r.data.questions || []))
+      .catch(() => {})
+      .finally(() => setSugLoading(false));
+  }, [matchId]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const sendMessage = async (text) => {
+    const q = text || input.trim();
+    if (!q || loading) return;
+    setInput('');
+    setLoading(true);
+    setMessages(prev => [...prev, { role: 'user', text: q }]);
+    try {
+      const r = await pronosticsApi.post(`/pronostics/live/${matchId}/chat`, { question: q });
+      setMessages(prev => [...prev, { role: 'ai', text: r.data.answer }]);
+      // Régénérer les suggestions après chaque réponse
+      pronosticsApi.get(`/pronostics/live/${matchId}/questions`)
+        .then(r => setSuggestions(r.data.questions || []))
+        .catch(() => {});
+    } catch {
+      setMessages(prev => [...prev, { role: 'ai', text: 'Erreur — réessayez dans un instant.' }]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ marginTop: 16, borderTop: `1px solid ${C.live}30`, paddingTop: 14 }}>
+      <div style={{ fontSize: 11, color: C.live, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+        <span style={{ width: 6, height: 6, background: C.live, borderRadius: '50%', display: 'inline-block', animation: 'blink 1s infinite' }}></span>
+        Live IA Coach
+      </div>
+
+      {/* Messages */}
+      {messages.length > 0 && (
+        <div style={{ maxHeight: 180, overflowY: 'auto', marginBottom: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {messages.map((m, i) => (
+            <div key={i} style={{
+              background: m.role === 'user' ? 'rgba(255,255,255,0.06)' : `${C.live}10`,
+              border: `1px solid ${m.role === 'user' ? 'rgba(255,255,255,0.08)' : C.live + '30'}`,
+              borderRadius: 10, padding: '8px 12px',
+              fontSize: 12, color: m.role === 'user' ? C.textSub : C.text,
+              alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
+              maxWidth: '85%'
+            }}>
+              {m.role === 'ai' && <span style={{ fontSize: 10, color: C.live, fontWeight: 700, display: 'block', marginBottom: 3 }}>🤖 IA Coach</span>}
+              {m.text}
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+      )}
+
+      {/* Suggestions contextuelles */}
+      {suggestions.length > 0 && !loading && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
+          {suggestions.map((q, i) => (
+            <button key={i} onClick={() => sendMessage(q)} style={{
+              background: 'rgba(255,255,255,0.04)', border: `1px solid ${C.live}30`,
+              color: C.textSub, borderRadius: 20, padding: '5px 12px',
+              fontSize: 11, cursor: 'pointer', fontFamily: 'inherit',
+              transition: 'all 0.2s'
+            }}>{q}</button>
+          ))}
+        </div>
+      )}
+
+      {/* Input */}
+      <div style={{ display: 'flex', gap: 8 }}>
+        <input
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && sendMessage()}
+          placeholder="Posez votre question sur le match..."
+          style={{
+            flex: 1, background: 'rgba(255,255,255,0.05)', border: `1px solid ${C.live}40`,
+            borderRadius: 10, padding: '9px 14px', color: C.text, fontSize: 12,
+            fontFamily: 'inherit', outline: 'none'
+          }}
+        />
+        <button onClick={() => sendMessage()} disabled={loading || !input.trim()} style={{
+          background: loading ? 'rgba(255,255,255,0.06)' : `linear-gradient(135deg, ${C.live}, #00b248)`,
+          color: loading ? C.textDim : '#000', border: 'none', borderRadius: 10,
+          padding: '9px 16px', fontWeight: 900, fontSize: 13, cursor: loading ? 'not-allowed' : 'pointer',
+          fontFamily: 'inherit'
+        }}>
+          {loading ? '...' : '→'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ─── CARTE MATCH ─────────────────────────────────────────────────────────────
-function MatchCard({ event, onGetPronostic, pronostic, animating, frozen, plan, quotaUsed }) {
+function MatchCard({ event, onGetPronostic, pronostic, animating, frozen, plan, quotaUsed, pronosticsApi }) {
   const isLive = event.statut === 'IN_PLAY' || event.statut === 'PAUSED';
   const isFinished = event.statut === 'FINISHED';
   const date = new Date(event.date_heure);
@@ -379,6 +509,8 @@ function MatchCard({ event, onGetPronostic, pronostic, animating, frozen, plan, 
         </button>
       )}
 
+      {/* LIVE IA COACH - TODO: réintégrer après correction */}
+
       <style>{`
         @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
         @keyframes shimmer { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
@@ -399,25 +531,29 @@ export default function Pronostics() {
   const [quotaUsed, setQuotaUsed] = useState(0);
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [error, setError] = useState(null);
+  const [stats, setStats] = useState(null);
   const QUOTA_FREE = 1;
 
   useEffect(() => {
-    pronosticsApi.get('/pronostics/events')
+    pronosticsApi.get('/matches')
       .then(r => setEvents(r.data))
       .catch(() => setError('Impossible de charger les matchs'))
       .finally(() => setLoadingEvents(false));
+    pronosticsApi.get('/stats')
+      .then(r => setStats(r.data))
+      .catch(() => {});
     if (user) loadQuota();
   }, [user]);
 
   const loadQuota = async () => {
     try {
-      const r = await pronosticsApi.get('/pronostics/auth/me');
+      const r = await pronosticsApi.get('/auth/me');
       setQuotaUsed(r.data.quota?.used || 0);
     } catch (_) {}
   };
 
   const getPronostic = async (eventId) => {
-    if (!user) { navigate('/pronostics/login'); return; }
+    if (!user) { navigate('/login'); return; }
 
     if (plan === 'free' && quotaUsed >= QUOTA_FREE) {
       setAnimating(p => ({ ...p, [eventId]: true }));
@@ -434,7 +570,7 @@ export default function Pronostics() {
 
     try {
       await new Promise(resolve => setTimeout(resolve, 8000));
-      const r = await pronosticsApi.get(`/pronostics/events/${eventId}/pronostic`);
+      const r = await pronosticsApi.get(`/pronostics/${eventId}`);
       setPronostics(p => ({ ...p, [eventId]: r.data }));
       loadQuota();
     } catch (err) {
@@ -449,7 +585,11 @@ export default function Pronostics() {
   };
 
   const liveEvents = events.filter(e => e.statut === 'IN_PLAY' || e.statut === 'PAUSED');
-  const upcomingEvents = events.filter(e => e.statut === 'SCHEDULED');
+  const scheduledEvents = events.filter(e => e.statut === 'SCHEDULED' || e.statut === 'TIMED');
+  const finishedEvents = [...events].filter(e => e.statut === 'FINISHED').reverse().slice(0, 12);
+  // Si pas de matchs à venir, afficher les derniers résultats
+  const upcomingEvents = scheduledEvents.length > 0 ? scheduledEvents : finishedEvents;
+  const sectionTitle = scheduledEvents.length > 0 ? '⚽ PROCHAINS MATCHS' : '📊 DERNIERS RÉSULTATS';
 
   return (
     <div style={{ minHeight: '100vh', background: C.bg, color: C.text, fontFamily: "'Inter', system-ui, sans-serif" }}>
@@ -463,14 +603,10 @@ export default function Pronostics() {
         borderBottom: `1px solid ${C.border}`,
         padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <Link to="/" style={{ textDecoration: 'none' }}>
-            <Logo size="sm" />
-          </Link>
-          <span style={{ color: 'rgba(255,255,255,0.12)', fontSize: 16 }}>|</span>
-          <span style={{ fontWeight: 900, fontSize: 14, color: C.text, letterSpacing: '-0.02em' }}>
-            🤖 Prédictions IA
-          </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 20 }}>🤖</span>
+          <span style={{ fontWeight: 900, fontSize: 16, color: C.text, letterSpacing: '-0.02em' }}>Prédictions IA</span>
+          <span style={{ fontSize: 10, color: C.accent, fontWeight: 700, background: `${C.accent}15`, border: `1px solid ${C.accent}40`, padding: '2px 8px', borderRadius: 20, textTransform: 'uppercase', letterSpacing: '0.08em' }}>CDM 2026</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {user ? (
@@ -491,7 +627,7 @@ export default function Pronostics() {
               )}
             </div>
           ) : (
-            <Link to="/pronostics/login" style={{
+            <Link to="/login" style={{
               background: `linear-gradient(135deg, ${C.accent}, #c62828)`,
               color: '#fff', borderRadius: 20, padding: '8px 18px',
               fontSize: 13, fontWeight: 900, textDecoration: 'none',
@@ -503,9 +639,11 @@ export default function Pronostics() {
 
       {/* HERO */}
       <div style={{
-        background: `linear-gradient(180deg, rgba(255,59,59,0.06) 0%, rgba(255,215,0,0.04) 40%, transparent 100%)`,
-        padding: '52px 20px 44px', textAlign: 'center',
-        borderBottom: `1px solid ${C.border}`,
+        backgroundImage: `linear-gradient(180deg, rgba(13,13,20,0.75) 0%, rgba(13,13,20,0.55) 50%, rgba(13,13,20,0.88) 100%), url('/stadium_bg.jpg')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center 30%',
+        padding: '72px 20px 56px', textAlign: 'center',
+        borderBottom: `1px solid rgba(255,255,255,0.08)`,
         position: 'relative', overflow: 'hidden'
       }}>
         {/* Effet de lumière background */}
@@ -554,7 +692,7 @@ export default function Pronostics() {
 
           {!user && (
             <div>
-              <Link to="/pronostics/login" style={{
+              <Link to="/login" style={{
                 display: 'inline-block',
                 background: `linear-gradient(135deg, ${C.accent}, #c62828)`,
                 color: '#fff', borderRadius: 24, padding: '14px 36px',
@@ -606,7 +744,7 @@ export default function Pronostics() {
         {/* Prochains matchs */}
         <section>
           <h2 style={{ fontSize: 16, fontWeight: 900, color: C.text, marginBottom: 16, letterSpacing: '-0.02em' }}>
-            ⚽ PROCHAINS MATCHS
+            {sectionTitle}
           </h2>
           {loadingEvents ? (
             <div style={{ textAlign: 'center', padding: '60px 0', color: C.textSub }}>
@@ -625,16 +763,115 @@ export default function Pronostics() {
               {upcomingEvents.map(event => (
                 <MatchCard key={event.id} event={event} onGetPronostic={getPronostic}
                   pronostic={pronostics[event.id]} animating={animating[event.id]}
-                  frozen={frozen[event.id]} plan={plan} quotaUsed={quotaUsed} />
+                  frozen={frozen[event.id]} plan={plan} quotaUsed={quotaUsed}
+                  pronosticsApi={pronosticsApi} />
               ))}
             </div>
           )}
         </section>
 
-        <div style={{ textAlign: 'center', marginTop: 48, paddingTop: 32, borderTop: `1px solid ${C.border}` }}>
-          <Link to="/" style={{ fontSize: 13, color: C.textDim, textDecoration: 'none', fontWeight: 600 }}>
-            ← Retour à coupedumonde.ai
-          </Link>
+        {/* SECTION BILAN STATS */}
+        <section style={{ marginTop: 64, marginBottom: 48 }}>
+          <div style={{ marginBottom: 32 }}>
+            <div style={{ fontSize: 11, color: C.accent, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>Transparence</div>
+            <h2 style={{ fontSize: 'clamp(26px, 4vw, 38px)', fontWeight: 900, color: C.text, letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 10 }}>
+              Le bilan de nos pronostics.
+            </h2>
+            <p style={{ fontSize: 14, color: C.textSub, maxWidth: 480, lineHeight: 1.7 }}>
+              On ne cache pas nos erreurs. Voici les derniers matchs joués : ce que notre IA avait prédit, le résultat réel, et si on était dans le vrai.
+            </p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16 }}>
+            {[
+              {
+                pct: stats ? `${stats.bestCorrect.pct}%` : '—',
+                label: 'Bon résultat (1·N·2)',
+                sub: stats ? `${stats.bestCorrect.count}/${stats.bestCorrect.total} matchs · ${stats.bestCorrect.label}` : 'Calcul en cours...',
+                color: C.green
+              },
+              {
+                pct: stats ? `${stats.bestScoreExact.pct}%` : '—',
+                label: 'Score exact',
+                sub: stats ? `${stats.bestScoreExact.count}/${stats.bestScoreExact.total} matchs · ${stats.bestScoreExact.label}` : 'Calcul en cours...',
+                color: C.gold
+              },
+              {
+                pct: stats ? `${stats.bestProche.pct}%` : '—',
+                label: 'Proches ou justes',
+                sub: stats ? `${stats.bestProche.count}/${stats.bestProche.total} matchs · ${stats.bestProche.label}` : 'Calcul en cours...',
+                color: C.blue
+              },
+            ].map(({ pct, label, sub, color }) => (
+              <div key={label} style={{
+                background: C.bgCard, border: `1px solid ${C.border}`,
+                borderRadius: 14, padding: '24px 20px', textAlign: 'center'
+              }}>
+                <div style={{ fontSize: 42, fontWeight: 900, color, filter: `drop-shadow(0 0 12px ${color}60)`, marginBottom: 8 }}>{pct}</div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: C.text, marginBottom: 4 }}>{label}</div>
+                <div style={{ fontSize: 11, color: C.textDim, lineHeight: 1.5 }}>{sub}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* RÉSULTATS PASSÉS */}
+        {finishedEvents.length > 0 && (
+          <section style={{ marginBottom: 48 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {finishedEvents.map(event => {
+                const p = pronostics[event.id];
+                const scoreReel = `${event.score_p1 ?? '?'}-${event.score_p2 ?? '?'}`;
+                const gagnantReel = event.score_p1 > event.score_p2 ? event.participant1
+                  : event.score_p2 > event.score_p1 ? event.participant2 : 'Nul';
+                const iaOk = p && (p.favori === gagnantReel || (gagnantReel === 'Nul' && p.favori?.toLowerCase().includes('nul')));
+                const badge = !p ? null
+                  : iaOk ? { label: '✓ Correct', color: C.green, bg: `${C.green}12`, border: `${C.green}40` }
+                  : { label: '✕ Manqué', color: C.accent, bg: `${C.accent}10`, border: `${C.accent}40` };
+                return (
+                  <div key={event.id} style={{
+                    background: C.bgCard,
+                    border: `1px solid ${badge ? badge.border : 'rgba(255,255,255,0.05)'}`,
+                    borderLeft: `3px solid ${badge ? badge.color : 'rgba(255,255,255,0.08)'}`,
+                    borderRadius: 10, padding: '12px 16px',
+                    display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap'
+                  }}>
+                    {/* Equipe 1 */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: '0 0 auto' }}>
+                      {event.participant1_logo && <img src={event.participant1_logo} alt="" style={{ width: 24, height: 24, objectFit: 'contain', filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.6))' }} />}
+                      <span style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{event.participant1}</span>
+                    </div>
+                    {/* Score */}
+                    <div style={{
+                      fontSize: 18, fontWeight: 900, color: C.text,
+                      background: 'rgba(255,255,255,0.06)', borderRadius: 8,
+                      padding: '4px 14px', letterSpacing: '-0.02em', flexShrink: 0
+                    }}>{scoreReel}</div>
+                    {/* Equipe 2 */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: '0 0 auto' }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{event.participant2}</span>
+                      {event.participant2_logo && <img src={event.participant2_logo} alt="" style={{ width: 24, height: 24, objectFit: 'contain', filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.6))' }} />}
+                    </div>
+                    {/* Prédiction IA */}
+                    <div style={{ flex: 1, fontSize: 12, color: C.textDim, minWidth: 120 }}>
+                      {p && (
+                        <span>IA : <strong style={{ color: C.textSub }}>{p.favori}</strong>{p.score_exact ? <span style={{ color: C.textDim }}> · {p.score_exact}</span> : null}</span>
+                      )}
+                    </div>
+                    {/* Badge */}
+                    {badge && (
+                      <div style={{ fontSize: 11, fontWeight: 800, color: badge.color, background: badge.bg, border: `1px solid ${badge.border}`, padding: '4px 14px', borderRadius: 20, whiteSpace: 'nowrap', flexShrink: 0 }}>
+                        {badge.label}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        <div style={{ textAlign: 'center', marginTop: 48, paddingTop: 32, borderTop: `1px solid ${C.border}`, color: C.textDim, fontSize: 12 }}>
+          pronostics.coupedumonde.ai — Propulsé par l'IA
         </div>
       </div>
 
