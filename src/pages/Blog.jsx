@@ -11,9 +11,9 @@ const CAT = {
 };
 
 const DEFAULT_IMAGES = [
-  '/blog_card_tactics.jpg',
-  '/blog_card_ai.jpg',
-  '/blog_hero.jpg',
+  '/blog_card_tactics.webp',
+  '/blog_card_ai.webp',
+  '/blog_hero.webp',
 ];
 
 function getImg(article, idx) {
@@ -63,7 +63,7 @@ export function BlogList() {
         {/* Image de fond stade */}
         <div style={{
           position: 'absolute', inset: 0,
-          backgroundImage: 'url(/blog_hero.jpg)',
+          backgroundImage: 'url(/blog_hero.webp)',
           backgroundSize: 'cover', backgroundPosition: 'center 40%',
           filter: 'brightness(0.35)',
         }} />
@@ -155,7 +155,7 @@ export function BlogList() {
         }}>
           <div style={{
             position: 'absolute', inset: 0,
-            backgroundImage: 'url(/blog_card_tactics.jpg)',
+            backgroundImage: 'url(/blog_card_tactics.webp)',
             backgroundSize: 'cover', backgroundPosition: 'center',
             filter: 'brightness(0.25)',
           }} />
@@ -306,7 +306,7 @@ function ArticleCard({ article, navigate, idx }) {
 function EmptyState({ navigate }) {
   return (
     <div style={{ position: 'relative', overflow: 'hidden', borderRadius: 20, minHeight: 360, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url(/blog_hero.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.2)' }} />
+      <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url(/blog_hero.webp)', backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.2)' }} />
       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(255,59,59,0.2), rgba(10,12,20,0.8))' }} />
       <div style={{ position: 'relative', textAlign: 'center', padding: '40px 24px' }}>
         <div style={{ fontSize: 56, marginBottom: 16 }}>📡</div>
@@ -401,7 +401,7 @@ export function BlogArticle() {
 
         {/* CTA */}
         <div style={{ position: 'relative', overflow: 'hidden', borderRadius: 16, marginTop: 40, marginBottom: 40 }}>
-          <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url(/blog_card_tactics.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.2)' }} />
+          <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url(/blog_card_tactics.webp)', backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.2)' }} />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(255,59,59,0.25), rgba(10,12,20,0.8))' }} />
           <div style={{ position: 'relative', padding: '24px 28px', display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
             <div style={{ flex: 1 }}>
