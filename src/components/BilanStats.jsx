@@ -35,6 +35,8 @@ export default function BilanStats({ compact = false, competitionId = '2000', co
       .catch(() => {})
   }, [competitionId])
 
+  const hasStats = Boolean(stats?.available !== false && stats?.bestCorrect && stats?.bestScoreExact)
+
   return (
     <section style={{ marginBottom: compact ? 24 : 48 }}>
       {/* Titre */}
@@ -56,11 +58,17 @@ export default function BilanStats({ compact = false, competitionId = '2000', co
         </div>
       )}
 
-      {/* Cartes stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 16 }}>
+      {!hasStats && !loading && (
+        <div style={{ background: C.bgCard, border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px', marginBottom: 16, color: C.textSub, fontSize: 13, lineHeight: 1.6 }}>
+          📊 {stats?.message || 'Les statistiques réelles de cette compétition seront disponibles après les premiers matchs analysés.'}
+        </div>
+      )}
+
+      {/* Cartes stats — affichées uniquement avec des résultats réels. */}
+      {hasStats && <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 16 }}>
         {[
-          { pct: stats ? `${stats.bestCorrect.pct}%` : '—', label: 'Bon résultat (1·N·2)', sub: stats ? `${stats.bestCorrect.count}/${stats.bestCorrect.total} matchs · ${stats.bestCorrect.label}` : '...', color: C.green },
-          { pct: stats ? `${stats.bestScoreExact.pct}%` : '—', label: 'Score exact', sub: stats ? `${stats.bestScoreExact.count}/${stats.bestScoreExact.total} matchs · ${stats.bestScoreExact.label}` : '...', color: C.gold },
+          { pct: `${stats.bestCorrect.pct}%`, label: 'Bon résultat (1·N·2)', sub: `${stats.bestCorrect.count}/${stats.bestCorrect.total} matchs · ${stats.bestCorrect.label}`, color: C.green },
+          { pct: `${stats.bestScoreExact.pct}%`, label: 'Score exact', sub: `${stats.bestScoreExact.count}/${stats.bestScoreExact.total} matchs · ${stats.bestScoreExact.label}`, color: C.gold },
         ].map(({ pct, label, sub, color }) => (
           <div key={label} style={{ background: C.bgCard, border: `1px solid ${C.border}`, borderRadius: 12, padding: compact ? '14px 12px' : '20px 16px', textAlign: 'center' }}>
             <div style={{ fontSize: compact ? 32 : 40, fontWeight: 900, color, filter: `drop-shadow(0 0 10px ${color}50)`, marginBottom: 6 }}>{pct}</div>
@@ -68,7 +76,7 @@ export default function BilanStats({ compact = false, competitionId = '2000', co
             <div style={{ fontSize: 10, color: C.textDim, lineHeight: 1.4 }}>{sub}</div>
           </div>
         ))}
-      </div>
+      </div>}
 
       {/* Résultats passés */}
       {finishedMatches.length > 0 && (
