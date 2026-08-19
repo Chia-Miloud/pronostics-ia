@@ -2,6 +2,14 @@
   command = "npm run build"
   publish = "dist"
 
+# Préserve le référencement et les liens existants après le changement de marque.
+[[redirects]]
+  from = "https://pronostics.coupedumonde.ai/*"
+  to = "https://prono-sport.io/:splat"
+  status = 301
+  force = true
+
+# Route toutes les pages de l'application React vers son point d'entrée.
 [[redirects]]
   from = "/*"
   to = "/index.html"
