@@ -37,43 +37,44 @@ export default function PronosticsAuth() {
   };
 
   const inputStyle = {
-    width: '100%', background: '#fff', border: '1.5px solid rgba(19,34,24,0.15)',
-    borderRadius: 10, padding: '11px 14px', fontSize: 14, color: '#132218',
+    width: '100%', background: 'rgba(255,255,255,0.05)', border: '1.5px solid rgba(255,255,255,0.08)',
+    borderRadius: 10, padding: '11px 14px', fontSize: 14, color: '#f1f5f9',
     outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit',
     transition: 'border-color 0.2s'
   };
 
   const labelStyle = {
-    fontSize: 11, fontWeight: 700, color: '#5a6b60',
+    fontSize: 11, fontWeight: 700, color: '#475569',
     textTransform: 'uppercase', letterSpacing: '0.06em',
     display: 'block', marginBottom: 6
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f6f1e4', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div style={{ minHeight: '100vh', background: '#0a0e1a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, fontFamily: "'Inter', system-ui, sans-serif" }}>
       <div style={{ width: '100%', maxWidth: 420 }}>
 
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
           <Link to="/" style={{ textDecoration: 'none', display: 'inline-block', marginBottom: 14 }}>
             <Logo size="md" />
           </Link>
-          <div style={{ fontWeight: 800, fontSize: 20, color: '#132218', letterSpacing: '-0.02em' }}>🤖 Prédictions IA</div>
-          <div style={{ fontSize: 14, color: '#5a6b60', marginTop: 6 }}>
+          <div style={{ fontWeight: 900, fontSize: 22, color: '#f1f5f9', letterSpacing: '-0.03em' }}>⚽ Prono <span style={{ color: '#e53e3e' }}>Sport</span></div>
+          <div style={{ fontSize: 14, color: '#94a3b8', marginTop: 6 }}>
             {mode === 'login' ? 'Connectez-vous pour accéder à vos pronostics' : '3 pronostics gratuits par jour — sans carte bancaire'}
           </div>
         </div>
 
-        <div style={{ background: '#fbf7ec', border: '1px solid rgba(19,34,24,0.10)', borderRadius: 20, padding: 28, boxShadow: '0 10px 30px -10px rgba(19,34,24,0.12)' }}>
+        <div style={{ background: '#111827', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 20, padding: 28, boxShadow: '0 10px 40px rgba(0,0,0,0.5)', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, transparent, #e53e3e, #fbbf24, #e53e3e, transparent)' }} />
 
           {/* Tabs */}
-          <div style={{ display: 'flex', gap: 4, background: '#ede8dc', borderRadius: 12, padding: 4, marginBottom: 24 }}>
+          <div style={{ display: 'flex', gap: 4, background: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 4, marginBottom: 24 }}>
             {['login', 'register'].map(m => (
               <button key={m} onClick={() => setMode(m)} style={{
                 flex: 1, padding: '9px 0', borderRadius: 9, border: 'none', cursor: 'pointer',
                 fontWeight: 700, fontSize: 13, fontFamily: 'inherit',
-                background: mode === m ? '#fff' : 'transparent',
-                color: mode === m ? '#132218' : '#8a9288',
-                boxShadow: mode === m ? '0 1px 4px rgba(19,34,24,0.10)' : 'none',
+                background: mode === m ? '#1e2a3a' : 'transparent',
+                color: mode === m ? '#f1f5f9' : '#475569',
+                boxShadow: mode === m ? '0 1px 4px rgba(0,0,0,0.3)' : 'none',
                 transition: 'all 0.2s'
               }}>
                 {m === 'login' ? 'Connexion' : 'Inscription gratuite'}
@@ -82,7 +83,7 @@ export default function PronosticsAuth() {
           </div>
 
           {error && (
-            <div style={{ background: '#f6e1e5', border: '1px solid #c8102e', color: '#c8102e', borderRadius: 10, padding: '10px 14px', fontSize: 13, marginBottom: 16 }}>
+            <div style={{ background: 'rgba(229,62,62,0.12)', border: '1px solid rgba(229,62,62,0.4)', color: '#e53e3e', borderRadius: 10, padding: '10px 14px', fontSize: 13, marginBottom: 16 }}>
               {error}
             </div>
           )}
@@ -128,7 +129,7 @@ export default function PronosticsAuth() {
             </div>
 
             <button type="submit" disabled={loading} style={{
-              width: '100%', background: loading ? '#c8ddce' : '#2f8553', color: '#fff',
+              width: '100%',               background: loading ? 'rgba(229,62,62,0.4)' : 'linear-gradient(135deg, #e53e3e, #c62828)', color: '#fff',
               border: 'none', borderRadius: 12, padding: '13px 0', fontWeight: 800, fontSize: 15,
               cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'inherit', marginTop: 4,
               transition: 'background 0.2s'
@@ -137,7 +138,7 @@ export default function PronosticsAuth() {
             </button>
 
             {mode === 'register' && (
-              <p style={{ fontSize: 11, color: '#8a9288', textAlign: 'center', margin: 0, lineHeight: 1.5 }}>
+              <p style={{ fontSize: 11, color: '#475569', textAlign: 'center', margin: 0, lineHeight: 1.5 }}>
                 En créant un compte, vous acceptez nos <Link to="/rgpd" style={{ color: '#5a6b60' }}>conditions d'utilisation</Link>.
                 Vos données ne sont jamais partagées.
               </p>
@@ -146,7 +147,7 @@ export default function PronosticsAuth() {
         </div>
 
         <div style={{ textAlign: 'center', marginTop: 20 }}>
-          <Link to="/pronostics" style={{ fontSize: 13, color: '#5a6b60', textDecoration: 'none', fontWeight: 600 }}>
+          <Link to="/" style={{ fontSize: 13, color: '#475569', textDecoration: 'none', fontWeight: 600 }}>
             ← Retour aux pronostics
           </Link>
         </div>

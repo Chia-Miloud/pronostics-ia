@@ -1,9 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
-const apiBaseUrl = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
-  : 'https://app-fc4c031c-e53f-414b-9432-12308dc16cbd.cleverapps.io/api';
+const apiBaseUrl = 'https://app-7a3df0bb-9561-4735-b916-cfffb7487eba.cleverapps.io/api';
 
 const pronosticsApi = axios.create({ baseURL: apiBaseUrl });
 
@@ -22,8 +20,8 @@ export const PronosticsProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem('pronostics_token');
     if (token) {
-      pronosticsApi.get('/pronostics/auth/me')
-        .then(r => setUser(r.data))
+      pronosticsApi.get('/auth/me')
+        .then(r => setUser(r.data.user || r.data))
         .catch(() => { localStorage.removeItem('pronostics_token'); })
         .finally(() => setLoading(false));
     } else {
@@ -32,14 +30,14 @@ export const PronosticsProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    const r = await pronosticsApi.post('/pronostics/auth/login', { email, password });
+    const r = await pronosticsApi.post('/auth/login', { email, password });
     localStorage.setItem('pronostics_token', r.data.token);
     setUser(r.data.user);
     return r.data;
   };
 
-  const register = async (email, pseudo, password) => {
-    const r = await pronosticsApi.post('/pronostics/auth/register', { email, pseudo, password });
+  const register = async (email, pseudo, password, extra = {}) => {
+    const r = await pronosticsApi.post('/auth/register', { email, pseudo, password, ...extra });
     localStorage.setItem('pronostics_token', r.data.token);
     setUser(r.data.user);
     return r.data;

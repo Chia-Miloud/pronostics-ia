@@ -228,93 +228,171 @@ function PaywallModal({ onClose }) {
 
 // ─── RÉSULTAT PRONOSTIC ───────────────────────────────────────────────────────
 function PronosticResult({ pronostic }) {
-  const confColor = pronostic.niveau_confiance === 'très élevée' ? C.green
-    : pronostic.niveau_confiance === 'élevée' ? C.gold
-    : pronostic.niveau_confiance === 'moyenne' ? C.blue : C.textSub;
+  const p1 = pronostic.prob_p1 || 0;
+  const pN = pronostic.prob_nul || 0;
+  const p2 = pronostic.prob_p2 || 0;
+  const conf = pronostic.score_confiance || 0;
+  const confColor = conf >= 73 ? C.green : conf >= 60 ? C.gold : C.blue;
+  const confLabel = conf >= 73 ? 'Élevée' : conf >= 60 ? 'Modérée' : 'Faible';
+  const circumference = 2 * Math.PI * 20;
 
   return (
-    <div style={{
-      background: 'rgba(0,230,118,0.05)',
-      border: `1px solid ${C.green}30`,
-      borderRadius: 12, padding: '16px', marginTop: 4
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+    <div style={{ marginTop: 8 }}>
+
+      {/* ─ BARRE TRICOLORE PRINCIPALE ─ */}
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 6 }}>
+          <div style={{ textAlign: 'center', flex: 1 }}>
+            <div style={{ fontSize: 16, fontWeight: 900, color: C.blue }}>{p1}%</div>
+            <div style={{ fontSize: 9, color: C.textDim, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Victoire 1</div>
+          </div>
+          <div style={{ textAlign: 'center', flex: 1 }}>
+            <div style={{ fontSize: 16, fontWeight: 900, color: C.textSub }}>{pN}%</div>
+            <div style={{ fontSize: 9, color: C.textDim, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Nul</div>
+          </div>
+          <div style={{ textAlign: 'center', flex: 1 }}>
+            <div style={{ fontSize: 16, fontWeight: 900, color: C.accent }}>{p2}%</div>
+            <div style={{ fontSize: 9, color: C.textDim, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Victoire 2</div>
+          </div>
+        </div>
+        {/* Barre tricolore style ADI PredictStreet */}
+        <div style={{ height: 8, borderRadius: 8, overflow: 'hidden', display: 'flex', background: 'rgba(255,255,255,0.05)' }}>
+          <div style={{ width: `${p1}%`, background: `linear-gradient(90deg, #1a56db, ${C.blue})`, transition: 'width 1s ease', minWidth: p1 > 0 ? 4 : 0 }} />
+          <div style={{ width: `${pN}%`, background: 'linear-gradient(90deg, #4a5568, #718096)', transition: 'width 1s ease', minWidth: pN > 0 ? 4 : 0 }} />
+          <div style={{ width: `${p2}%`, background: `linear-gradient(90deg, #c62828, ${C.accent})`, transition: 'width 1s ease', minWidth: p2 > 0 ? 4 : 0 }} />
+        </div>
+      </div>
+
+      {/* ─ FAVORI + JAUGE CONFIANCE ─ */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, background: 'rgba(255,255,255,0.03)', borderRadius: 10, padding: '10px 14px', border: '1px solid rgba(255,255,255,0.06)' }}>
         <div>
-          <div style={{ fontSize: 10, color: C.textDim, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2 }}>Favori IA</div>
-          <div style={{ fontSize: 18, fontWeight: 900, color: C.text }}>{pronostic.favori}</div>
+          <div style={{ fontSize: 9, color: C.textDim, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 3 }}>Favori</div>
+          <div style={{ fontSize: 14, fontWeight: 900, color: C.text }}>{pronostic.favori}</div>
         </div>
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: 10, color: C.textDim, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2 }}>Confiance</div>
-          <div style={{ fontSize: 22, fontWeight: 900, color: confColor, filter: `drop-shadow(0 0 8px ${confColor})` }}>
-            {pronostic.score_confiance}%
+        {/* Jauge circulaire de confiance */}
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ position: 'relative', width: 52, height: 52 }}>
+            <svg width="52" height="52" viewBox="0 0 52 52" style={{ transform: 'rotate(-90deg)' }}>
+              <circle cx="26" cy="26" r="20" fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="5" />
+              <circle cx="26" cy="26" r="20" fill="none" stroke={confColor}
+                strokeWidth="5" strokeLinecap="round"
+                strokeDasharray={`${circumference}`}
+                strokeDashoffset={`${circumference * (1 - conf / 100)}`}
+                style={{ filter: `drop-shadow(0 0 4px ${confColor})` }}
+              />
+            </svg>
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ fontSize: 12, fontWeight: 900, color: confColor }}>{conf}%</span>
+            </div>
           </div>
+          <div style={{ fontSize: 9, color: confColor, fontWeight: 700, marginTop: 2 }}>{confLabel}</div>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, marginBottom: 10 }}>
-        {[
-          { label: '1', val: pronostic.prob_p1, color: C.blue },
-          { label: 'N', val: pronostic.prob_nul, color: C.textSub },
-          { label: '2', val: pronostic.prob_p2, color: C.accent },
-        ].map(({ label, val, color }) => (
-          <div key={label} style={{
-            textAlign: 'center', background: 'rgba(255,255,255,0.04)',
-            border: `1px solid ${color}30`, borderRadius: 8, padding: '8px 4px'
-          }}>
-            <div style={{ fontSize: 10, color: C.textDim, fontWeight: 700, marginBottom: 2 }}>{label}</div>
-            <div style={{ fontSize: 16, fontWeight: 900, color }}>{val}%</div>
-          </div>
-        ))}
-      </div>
-
+      {/* ─ SCORE EXACT ─ */}
       {pronostic.score_exact ? (
         <div style={{
-          textAlign: 'center', background: `${C.gold}10`,
-          border: `1px solid ${C.gold}30`, borderRadius: 8, padding: '8px',
-          fontSize: 13, color: C.gold, fontWeight: 800, marginBottom: 10
+          textAlign: 'center',
+          background: `linear-gradient(135deg, ${C.gold}12, ${C.gold}06)`,
+          border: `1px solid ${C.gold}40`, borderRadius: 10, padding: '10px',
+          marginBottom: 10, position: 'relative', overflow: 'hidden'
         }}>
-          Score probable : {pronostic.score_exact}
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, transparent, ${C.gold}80, transparent)` }} />
+          <div style={{ fontSize: 9, color: C.gold, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Score probable</div>
+          <div style={{ fontSize: 24, fontWeight: 900, color: C.gold, letterSpacing: '-0.02em', filter: `drop-shadow(0 0 8px ${C.goldGlow})` }}>
+            {pronostic.score_exact}
+          </div>
         </div>
       ) : (
         <div style={{
           textAlign: 'center', background: 'rgba(255,255,255,0.03)',
-          border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '8px',
-          fontSize: 12, color: C.textDim, marginBottom: 10,
+          border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, padding: '9px',
+          fontSize: 11, color: C.textDim, marginBottom: 10,
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6
         }}>
-          <span>🔒</span> Score exact réservé aux abonnés <strong style={{color: C.gold}}>AI Plus</strong>
+          🔒 Score exact — <strong style={{ color: C.gold }}>AI Plus</strong>
         </div>
       )}
 
+      {/* ─ COTES BOOKMAKERS ─ */}
+      {pronostic.cotes && (
+        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, padding: '10px 14px', marginBottom: 10 }}>
+          <div style={{ fontSize: 9, color: C.textDim, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+            📊 Cotes moyennes — {pronostic.cotes.source || 'Betclic/Unibet/Winamax/PMU'}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, marginBottom: pronostic.cotes.score_exact ? 8 : 0 }}>
+            {[
+              { label: '1', val: pronostic.cotes.victoire_1, color: C.blue },
+              { label: 'N', val: pronostic.cotes.nul, color: C.textSub },
+              { label: '2', val: pronostic.cotes.victoire_2, color: C.accent },
+            ].map(({ label, val, color }) => val ? (
+              <div key={label} style={{ textAlign: 'center', background: `${color}10`, border: `1px solid ${color}30`, borderRadius: 8, padding: '6px 4px' }}>
+                <div style={{ fontSize: 9, color: C.textDim, fontWeight: 700, marginBottom: 2 }}>{label}</div>
+                <div style={{ fontSize: 15, fontWeight: 900, color }}>{typeof val === 'number' ? val.toFixed(2) : val}</div>
+              </div>
+            ) : null)}
+          </div>
+          {pronostic.cotes.score_exact && (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: `${C.gold}08`, border: `1px solid ${C.gold}25`, borderRadius: 8, padding: '6px 10px' }}>
+              <span style={{ fontSize: 10, color: C.textDim }}>Score exact {pronostic.score_exact}</span>
+              <span style={{ fontSize: 14, fontWeight: 900, color: C.gold }}>{typeof pronostic.cotes.score_exact === 'number' ? pronostic.cotes.score_exact.toFixed(2) : pronostic.cotes.score_exact}</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ─ BUTEURS POTENTIELS ─ */}
+      {pronostic.buteurs && pronostic.buteurs.length > 0 && (
+        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, padding: '10px 14px', marginBottom: 10 }}>
+          <div style={{ fontSize: 9, color: C.textDim, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+            ⚽ Buteurs potentiels
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {pronostic.buteurs.map((b, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 36, textAlign: 'center', background: `${C.gold}15`, border: `1px solid ${C.gold}30`, borderRadius: 6, padding: '3px 0', flexShrink: 0 }}>
+                  <span style={{ fontSize: 12, fontWeight: 900, color: C.gold }}>{b.pct}%</span>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.nom}</div>
+                  <div style={{ fontSize: 10, color: C.textDim }}>{b.equipe}</div>
+                </div>
+                {b.raison && <div style={{ fontSize: 10, color: C.textSub, maxWidth: 120, textAlign: 'right', lineHeight: 1.3 }}>{b.raison}</div>}
+              </div>
+            ))}
+            {/* Si plan free, afficher le verrou pour les autres buteurs */}
+            {pronostic._buteurs_locked && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, opacity: 0.5, padding: '4px 0' }}>
+                <div style={{ width: 36, textAlign: 'center', background: 'rgba(255,255,255,0.05)', borderRadius: 6, padding: '3px 0' }}>
+                  <span style={{ fontSize: 11, color: C.textDim }}>🔒</span>
+                </div>
+                <span style={{ fontSize: 11, color: C.textDim }}>+3 buteurs — <strong style={{ color: C.gold }}>AI Plus</strong></span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ─ ANALYSE ─ */}
       {pronostic.analyse_texte && (
-        <p style={{ fontSize: 12, color: C.textSub, lineHeight: 1.6, margin: 0, fontStyle: 'italic' }}>
-          "{pronostic.analyse_texte}"
-        </p>
+        <div style={{ background: 'rgba(255,255,255,0.02)', borderLeft: `2px solid ${C.green}50`, borderRadius: '0 8px 8px 0', padding: '9px 12px' }}>
+          <div style={{ fontSize: 9, color: C.green, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Analyse</div>
+          <p style={{ fontSize: 11, color: C.textSub, lineHeight: 1.65, margin: 0 }}>{pronostic.analyse_texte}</p>
+        </div>
       )}
     </div>
   );
 }
 
-// ─── WRAPPER SECURISE LIVE IA COACH ─────────────────────────────────────────────
-function LiveIACoachWrapper({ matchId, match, pronosticsApi }) {
-  const [hasError, setHasError] = useState(false);
-  if (hasError) return null;
-  try {
-    return <LiveIACoachInline matchId={matchId} match={match} pronosticsApi={pronosticsApi} />;
-  } catch (e) {
-    console.error('LiveIACoach error:', e);
-    return null;
-  }
-}
-
 // ─── LIVE IA COACH INLINE ───────────────────────────────────────────────────
-function LiveIACoachInline({ matchId, match, pronosticsApi }) {
+function LiveIACoachInline({ matchId, pronosticsApi }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [sugLoading, setSugLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
 
   useEffect(() => {
     // Charger les questions contextuelles au montage
@@ -326,7 +404,10 @@ function LiveIACoachInline({ matchId, match, pronosticsApi }) {
   }, [matchId]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Scroller dans le conteneur messages uniquement, pas dans la page
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
   }, [messages]);
 
   const sendMessage = async (text) => {
@@ -358,7 +439,7 @@ function LiveIACoachInline({ matchId, match, pronosticsApi }) {
 
       {/* Messages */}
       {messages.length > 0 && (
-        <div style={{ maxHeight: 180, overflowY: 'auto', marginBottom: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div ref={messagesContainerRef} style={{ maxHeight: 180, overflowY: 'auto', marginBottom: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
           {messages.map((m, i) => (
             <div key={i} style={{
               background: m.role === 'user' ? 'rgba(255,255,255,0.06)' : `${C.live}10`,
@@ -442,9 +523,33 @@ function MatchCard({ event, onGetPronostic, pronostic, animating, frozen, plan, 
 
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-        <span style={{ fontSize: 10, color: C.textDim, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-          {event.competition_nom}
-        </span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <span style={{ fontSize: 10, color: C.textDim, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            {event.competition_nom}
+          </span>
+          {event.phase && event.phase !== 'GROUP_STAGE' && (() => {
+            const phaseLabels = {
+              'LAST_32': '⚡ Seizièmes de finale',
+              'LAST_16': '⚡ Huitièmes de finale',
+              'QUARTER_FINALS': '🏆 Quarts de finale',
+              'SEMI_FINALS': '🔥 Demi-finales',
+              'FINAL': '👑 FINALE',
+              'THIRD_PLACE': '🥉 Match 3ème place',
+            };
+            const label = phaseLabels[event.phase];
+            if (!label) return null;
+            return (
+              <span style={{ fontSize: 12, color: C.gold, fontWeight: 800, letterSpacing: '-0.01em' }}>
+                {label}
+              </span>
+            );
+          })()}
+          {event.phase === 'GROUP_STAGE' && event.group_name && (
+            <span style={{ fontSize: 11, color: C.textSub, fontWeight: 600 }}>
+              Groupe {event.group_name}
+            </span>
+          )}
+        </div>
         {isLive ? (
           <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: C.live, fontWeight: 900,
             background: `${C.live}15`, padding: '3px 8px', borderRadius: 20, border: `1px solid ${C.live}40` }}>
@@ -461,25 +566,26 @@ function MatchCard({ event, onGetPronostic, pronostic, animating, frozen, plan, 
       </div>
 
       {/* Équipes */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1 }}>
-          {event.participant1_logo && <img src={event.participant1_logo} alt="" style={{ width: 36, height: 36, objectFit: 'contain', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.6))' }} />}
-          <span style={{ fontWeight: 900, color: C.text, fontSize: 15, letterSpacing: '-0.02em' }}>{event.participant1}</span>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'nowrap', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
+          {event.participant1_logo && <img src={event.participant1_logo} alt="" style={{ width: 32, height: 32, objectFit: 'contain', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.6))', flexShrink: 0 }} />}
+          <span style={{ fontWeight: 900, color: C.text, fontSize: 14, letterSpacing: '-0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{event.participant1}</span>
         </div>
-        <div style={{ textAlign: 'center', padding: '0 12px' }}>
+        <div style={{ textAlign: 'center', flexShrink: 0, padding: '0 8px' }}>
           {isLive || isFinished ? (
-            <span style={{ fontWeight: 900, color: C.gold, fontSize: 24, letterSpacing: '-0.03em',
-              filter: `drop-shadow(0 0 8px ${C.goldGlow})` }}>
-              {event.score_p1 ?? 0} – {event.score_p2 ?? 0}
-            </span>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, whiteSpace: 'nowrap' }}>
+              <span style={{ fontWeight: 900, color: C.gold, fontSize: 22, letterSpacing: '-0.02em', filter: `drop-shadow(0 0 8px ${C.goldGlow})` }}>{event.score_p1 ?? 0}</span>
+              <span style={{ fontWeight: 700, color: C.textDim, fontSize: 16 }}>-</span>
+              <span style={{ fontWeight: 900, color: C.gold, fontSize: 22, letterSpacing: '-0.02em', filter: `drop-shadow(0 0 8px ${C.goldGlow})` }}>{event.score_p2 ?? 0}</span>
+            </div>
           ) : (
-            <span style={{ color: C.textDim, fontSize: 13, fontWeight: 700,
-              background: 'rgba(255,255,255,0.05)', padding: '4px 12px', borderRadius: 20 }}>VS</span>
+            <span style={{ color: C.textDim, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap',
+              background: 'rgba(255,255,255,0.05)', padding: '4px 10px', borderRadius: 20 }}>VS</span>
           )}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, justifyContent: 'flex-end' }}>
-          <span style={{ fontWeight: 900, color: C.text, fontSize: 15, letterSpacing: '-0.02em' }}>{event.participant2}</span>
-          {event.participant2_logo && <img src={event.participant2_logo} alt="" style={{ width: 36, height: 36, objectFit: 'contain', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.6))' }} />}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, justifyContent: 'flex-end', minWidth: 0 }}>
+          <span style={{ fontWeight: 900, color: C.text, fontSize: 14, letterSpacing: '-0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'right' }}>{event.participant2}</span>
+          {event.participant2_logo && <img src={event.participant2_logo} alt="" style={{ width: 32, height: 32, objectFit: 'contain', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.6))', flexShrink: 0 }} />}
         </div>
       </div>
 
@@ -509,7 +615,10 @@ function MatchCard({ event, onGetPronostic, pronostic, animating, frozen, plan, 
         </button>
       )}
 
-      {/* LIVE IA COACH - TODO: réintégrer après correction */}
+      {/* LIVE IA COACH pour AI Premium sur les matchs en direct */}
+      {isLive && plan === 'ai_premium' && pronosticsApi && (
+        <LiveIACoachInline matchId={event.id} pronosticsApi={pronosticsApi} />
+      )}
 
       <style>{`
         @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
@@ -519,9 +628,87 @@ function MatchCard({ event, onGetPronostic, pronostic, animating, frozen, plan, 
   );
 }
 
+// ─── MENU UTILISATEUR ───────────────────────────────────────────────────────
+const ADMIN_EMAILS = ['miloudchia@gmail.com', 'miloudc@hotmail.com'];
+
+function UserMenu({ user, plan, quotaUsed, QUOTA_FREE, logout, navigate }) {
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClick = (e) => { if (menuRef.current && !menuRef.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const planColor = plan === 'free' ? C.textSub : plan === 'ai_plus' ? C.gold : C.accent;
+  const planLabel = plan === 'free' ? 'FREE' : plan === 'ai_plus' ? '🚀 AI PLUS' : '🧠 AI PREMIUM';
+  const isAdmin = ADMIN_EMAILS.includes(user?.email);
+
+  const menuItems = [
+    { icon: '📊', label: 'Tableau de bord', path: '/dashboard' },
+    { icon: '👤', label: 'Mon compte', path: '/dashboard' },
+    { icon: '💳', label: 'Mes abonnements', path: '/dashboard' },
+    ...(isAdmin ? [{ icon: '🔐', label: 'Panel Admin', path: '/admin', admin: true }] : []),
+    { icon: '📝', label: 'Blog', path: '/blog' },
+    { separator: true },
+    { icon: '🚪', label: 'Déconnexion', action: () => { logout(); navigate('/'); } },
+  ];
+
+  return (
+    <div ref={menuRef} style={{ position: 'relative' }}>
+      <button onClick={() => setOpen(!open)} style={{
+        background: plan === 'free' ? 'rgba(255,255,255,0.06)' : plan === 'ai_plus' ? `${C.gold}15` : `${C.accent}15`,
+        border: `1px solid ${plan === 'free' ? 'rgba(255,255,255,0.1)' : plan === 'ai_plus' ? C.gold + '40' : C.accent + '40'}`,
+        color: planColor, borderRadius: 20, padding: '6px 14px',
+        fontSize: 12, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit',
+        display: 'flex', alignItems: 'center', gap: 6
+      }}>
+        {planLabel}
+        <span style={{ fontSize: 10, opacity: 0.7, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', display: 'inline-block' }}>▼</span>
+      </button>
+
+      {open && (
+        <div style={{
+          position: 'absolute', top: 'calc(100% + 8px)', right: 0,
+          background: '#1a1f2e', border: `1px solid ${C.border}`,
+          borderRadius: 14, padding: '6px', minWidth: 200,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.6)', zIndex: 1000
+        }}>
+          {/* Profil */}
+          <div style={{ padding: '10px 14px 10px', borderBottom: `1px solid ${C.border}`, marginBottom: 4 }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: C.text }}>{user.prenom || user.pseudo || user.email.split('@')[0]}</div>
+            <div style={{ fontSize: 11, color: C.textDim, marginTop: 2 }}>{user.email}</div>
+            {plan === 'free' && <div style={{ fontSize: 10, color: C.textDim, marginTop: 4 }}>{quotaUsed}/{QUOTA_FREE} pronostic aujourd'hui</div>}
+          </div>
+
+          {menuItems.map((item, i) => {
+            if (item.separator) return <div key={i} style={{ height: 1, background: C.border, margin: '4px 0' }} />;
+            return (
+              <button key={i} onClick={() => { setOpen(false); item.action ? item.action() : navigate(item.path); }}
+                style={{
+                  width: '100%', background: item.admin ? `${C.accent}10` : 'transparent',
+                  border: 'none', color: item.admin ? C.accent : item.label === 'Déconnexion' ? '#ff6b6b' : C.textSub,
+                  borderRadius: 10, padding: '10px 14px', fontSize: 13, cursor: 'pointer',
+                  fontFamily: 'inherit', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 10,
+                  transition: 'background 0.15s', fontWeight: item.admin ? 700 : 400
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
+                onMouseLeave={e => e.currentTarget.style.background = item.admin ? `${C.accent}10` : 'transparent'}
+              >
+                <span>{item.icon}</span> {item.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── PAGE PRINCIPALE ──────────────────────────────────────────────────────────
 export default function Pronostics() {
-  const { user, plan, pronosticsApi } = usePronostics();
+  const { user, plan, pronosticsApi, logout } = usePronostics();
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [pronostics, setPronostics] = useState({});
@@ -532,18 +719,67 @@ export default function Pronostics() {
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [error, setError] = useState(null);
   const [stats, setStats] = useState(null);
+  const [activeComp, setActiveComp] = useState('2000'); // Prono Sport par défaut
   const QUOTA_FREE = 1;
 
+  const COMPS = [
+    { id: '2000', label: '🌍 Prono Sport', flag: '🌍', active: true },
+    { id: '2001', label: '🇪🇺 Champions League', flag: '🇪🇺', active: true },
+    { id: '2021', label: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', active: true },
+    { id: '2015', label: '🇫🇷 Ligue 1', flag: '🇫🇷', active: true },
+    { id: '2002', label: '🇩🇪 Bundesliga', flag: '🇩🇪', active: true },
+    { id: '2019', label: '🇮🇹 Serie A', flag: '🇮🇹', active: true },
+    { id: '2014', label: '🇪🇸 La Liga', flag: '🇪🇸', active: true },
+  ];
+
+  const loadCompMatches = (compId) => {
+    setLoadingEvents(true);
+    if (compId === '2000') {
+      pronosticsApi.get('/matches')
+        .then(r => setEvents(r.data))
+        .catch(() => setError('Impossible de charger les matchs'))
+        .finally(() => setLoadingEvents(false));
+    } else {
+      fetch(`https://app-7a3df0bb-9561-4735-b916-cfffb7487eba.cleverapps.io/api/competitions/${compId}/matches`)
+        .then(r => r.json())
+        .then(data => {
+          const matches = (data.matches || []).map(m => ({
+            ...m, id: m.id || m.external_id,
+            participant1: m.participant1 || m.equipe1,
+            participant2: m.participant2 || m.equipe2,
+            participant1_logo: m.participant1_logo || m.logo1,
+            participant2_logo: m.participant2_logo || m.logo2,
+          }));
+          setEvents(matches);
+          setLoadingEvents(false);
+        })
+        .catch(() => { setLoadingEvents(false); });
+    }
+  };
+
+  const refreshMatches = () => {
+    if (activeComp === '2000') {
+      pronosticsApi.get('/matches')
+        .then(r => setEvents(r.data))
+        .catch(() => {});
+    }
+  };
+
   useEffect(() => {
-    pronosticsApi.get('/matches')
-      .then(r => setEvents(r.data))
-      .catch(() => setError('Impossible de charger les matchs'))
-      .finally(() => setLoadingEvents(false));
+    loadCompMatches(activeComp);
     pronosticsApi.get('/stats')
       .then(r => setStats(r.data))
       .catch(() => {});
+    // Charger les pronostics génériques de l'IA pour le bilan (public)
+    pronosticsApi.get('/pronostics/results')
+      .then(r => setPronostics(prev => ({ ...r.data, ...prev })))
+      .catch(() => {});
     if (user) loadQuota();
-  }, [user]);
+
+    // Polling toutes les 30s pour les scores en temps réel
+    const pollInterval = setInterval(refreshMatches, 30 * 1000);
+    return () => clearInterval(pollInterval);
+  }, [user, activeComp]);
 
   const loadQuota = async () => {
     try {
@@ -605,27 +841,13 @@ export default function Pronostics() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ fontSize: 20 }}>🤖</span>
-          <span style={{ fontWeight: 900, fontSize: 16, color: C.text, letterSpacing: '-0.02em' }}>Prédictions IA</span>
-          <span style={{ fontSize: 10, color: C.accent, fontWeight: 700, background: `${C.accent}15`, border: `1px solid ${C.accent}40`, padding: '2px 8px', borderRadius: 20, textTransform: 'uppercase', letterSpacing: '0.08em' }}>CDM 2026</span>
+          <span style={{ fontWeight: 900, fontSize: 16, color: C.text, letterSpacing: '-0.02em' }}>Prono Sport</span>
+          <span style={{ fontSize: 10, color: C.accent, fontWeight: 700, background: `${C.accent}15`, border: `1px solid ${C.accent}40`, padding: '2px 8px', borderRadius: 20, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Prono Sport</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <Link to="/blog" style={{ fontSize: 12, color: C.textSub, textDecoration: 'none', fontWeight: 600 }}>📝 Blog</Link>
           {user ? (
-            <div style={{ textAlign: 'right' }}>
-              <div style={{
-                fontSize: 12, fontWeight: 900,
-                color: plan === 'free' ? C.textSub : plan === 'ai_plus' ? C.gold : C.accent,
-                background: plan === 'free' ? 'rgba(255,255,255,0.06)' : plan === 'ai_plus' ? `${C.gold}15` : `${C.accent}15`,
-                padding: '4px 10px', borderRadius: 20,
-                border: `1px solid ${plan === 'free' ? 'rgba(255,255,255,0.1)' : plan === 'ai_plus' ? C.gold + '40' : C.accent + '40'}`
-              }}>
-                {plan === 'free' ? 'FREE' : plan === 'ai_plus' ? '🚀 AI PLUS' : '🧠 AI PREMIUM'}
-              </div>
-              {plan === 'free' && (
-                <div style={{ fontSize: 10, color: C.textDim, marginTop: 2, textAlign: 'center' }}>
-                  {quotaUsed}/{QUOTA_FREE} aujourd'hui
-                </div>
-              )}
-            </div>
+            <UserMenu user={user} plan={plan} quotaUsed={quotaUsed} QUOTA_FREE={QUOTA_FREE} logout={logout} navigate={navigate} />
           ) : (
             <Link to="/login" style={{
               background: `linear-gradient(135deg, ${C.accent}, #c62828)`,
@@ -636,6 +858,30 @@ export default function Pronostics() {
           )}
         </div>
       </nav>
+
+      {/* BARRE COMPÉTITIONS */}
+      <div style={{ background: 'rgba(6,8,15,0.98)', borderBottom: '1px solid rgba(255,255,255,0.07)', overflowX: 'auto', scrollbarWidth: 'none' }}>
+        <div style={{ display: 'flex', gap: 2, padding: '0 20px', maxWidth: 1200, margin: '0 auto' }}>
+          {COMPS.map(comp => (
+            <button key={comp.id} onClick={() => { setActiveComp(comp.id); setPronostics({}); }} style={{
+              background: activeComp === comp.id ? `${C.accent}20` : 'transparent',
+              border: 'none',
+              borderBottom: activeComp === comp.id ? `2px solid ${C.accent}` : '2px solid transparent',
+              color: activeComp === comp.id ? C.text : C.textDim,
+              padding: '12px 14px', fontSize: 12, cursor: 'pointer',
+              fontWeight: activeComp === comp.id ? 800 : 400, fontFamily: 'inherit',
+              whiteSpace: 'nowrap', transition: 'all 0.15s',
+            }}>
+              {comp.label}
+            </button>
+          ))}
+          {[{label:'🏀 Basketball'},{label:'🎾 Tennis'},{label:'🏉 Rugby'},{label:'🏒 Hockey'}].map(s => (
+            <button key={s.label} disabled style={{ background: 'transparent', border: 'none', borderBottom: '2px solid transparent', color: C.textDim, padding: '12px 14px', fontSize: 12, cursor: 'not-allowed', fontFamily: 'inherit', whiteSpace: 'nowrap', opacity: 0.4 }}>
+              {s.label} <span style={{ fontSize: 9, background: 'rgba(255,255,255,0.08)', padding: '1px 4px', borderRadius: 8 }}>Bientôt</span>
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* HERO */}
       <div style={{
@@ -662,7 +908,7 @@ export default function Pronostics() {
             fontSize: 11, fontWeight: 900, color: C.accent,
             textTransform: 'uppercase', letterSpacing: '0.1em'
           }}>
-            ⚽ Coupe du Monde 2026
+            ⚽ Prono Sport
           </div>
 
           <h1 style={{
@@ -735,7 +981,8 @@ export default function Pronostics() {
               {liveEvents.map(event => (
                 <MatchCard key={event.id} event={event} onGetPronostic={getPronostic}
                   pronostic={pronostics[event.id]} animating={animating[event.id]}
-                  frozen={frozen[event.id]} plan={plan} quotaUsed={quotaUsed} />
+                  frozen={frozen[event.id]} plan={plan} quotaUsed={quotaUsed}
+                  pronosticsApi={pronosticsApi} />
               ))}
             </div>
           </section>
@@ -795,12 +1042,7 @@ export default function Pronostics() {
                 sub: stats ? `${stats.bestScoreExact.count}/${stats.bestScoreExact.total} matchs · ${stats.bestScoreExact.label}` : 'Calcul en cours...',
                 color: C.gold
               },
-              {
-                pct: stats ? `${stats.bestProche.pct}%` : '—',
-                label: 'Proches ou justes',
-                sub: stats ? `${stats.bestProche.count}/${stats.bestProche.total} matchs · ${stats.bestProche.label}` : 'Calcul en cours...',
-                color: C.blue
-              },
+
             ].map(({ pct, label, sub, color }) => (
               <div key={label} style={{
                 background: C.bgCard, border: `1px solid ${C.border}`,
@@ -870,9 +1112,53 @@ export default function Pronostics() {
           </section>
         )}
 
-        <div style={{ textAlign: 'center', marginTop: 48, paddingTop: 32, borderTop: `1px solid ${C.border}`, color: C.textDim, fontSize: 12 }}>
-          pronostics.coupedumonde.ai — Propulsé par l'IA
-        </div>
+        {/* FOOTER */}
+        <footer style={{ marginTop: 64, paddingTop: 40, borderTop: `1px solid ${C.border}` }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 32, marginBottom: 40 }}>
+            {/* Marque */}
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <span style={{ fontSize: 20 }}>🤖</span>
+                <span style={{ fontWeight: 900, color: C.text, fontSize: 15 }}>Prono Sport</span>
+              </div>
+              <p style={{ fontSize: 12, color: C.textDim, lineHeight: 1.7, margin: 0 }}>
+                Pronostics sportifs générés par intelligence artificielle pour la Prono Sport.
+              </p>
+            </div>
+            {/* Navigation */}
+            <div>
+              <div style={{ fontSize: 11, color: C.textSub, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Navigation</div>
+              {[{label: '⚽ Pronostics', path: '/'}, {label: '📝 Blog & Analyses', path: '/blog'}, {label: '💳 Abonnements', path: '/abonnement'}, {label: '📊 Mon espace', path: '/dashboard'}].map(l => (
+                <Link key={l.path} to={l.path} style={{ display: 'block', fontSize: 13, color: C.textDim, textDecoration: 'none', marginBottom: 6, transition: 'color 0.2s' }}
+                  onMouseEnter={e => e.target.style.color = C.text} onMouseLeave={e => e.target.style.color = C.textDim}>
+                  {l.label}
+                </Link>
+              ))}
+            </div>
+            {/* Légal */}
+            <div>
+              <div style={{ fontSize: 11, color: C.textSub, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Légal</div>
+              {[{label: '🔒 Politique de confidentialité', path: '/rgpd'}, {label: '📄 Conditions Générales de Vente', path: '/cgv'}, {label: '📧 Nous contacter', path: '/contact'}].map(l => (
+                <Link key={l.path} to={l.path} style={{ display: 'block', fontSize: 13, color: C.textDim, textDecoration: 'none', marginBottom: 6, transition: 'color 0.2s' }}
+                  onMouseEnter={e => e.target.style.color = C.text} onMouseLeave={e => e.target.style.color = C.textDim}>
+                  {l.label}
+                </Link>
+              ))}
+            </div>
+            {/* Contact */}
+            <div>
+              <div style={{ fontSize: 11, color: C.textSub, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Contact</div>
+              <a href="mailto:contact@prono-sport.io" style={{ display: 'block', fontSize: 13, color: C.textDim, textDecoration: 'none', marginBottom: 6 }}>contact@prono-sport.io</a>
+              <div style={{ fontSize: 11, color: C.textDim, marginTop: 12, lineHeight: 1.6 }}>
+                ⚠️ Les pronostics sont fournis à titre informatif uniquement. Jouez de manière responsable.
+              </div>
+            </div>
+          </div>
+          <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+            <div style={{ fontSize: 12, color: C.textDim }}>© 2026 Prono Sport — Tous droits réservés</div>
+            <div style={{ fontSize: 11, color: C.textDim }}>Propulsé par l'IA · Données football-data.org · Hébergé sur Clever Cloud</div>
+          </div>
+        </footer>
       </div>
 
       <style>{`
