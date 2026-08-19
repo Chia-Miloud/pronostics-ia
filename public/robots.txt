@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://pronostics.coupedumonde.ai/sitemap.xml
+Sitemap: https://prono-sport.io/sitemap.xml
