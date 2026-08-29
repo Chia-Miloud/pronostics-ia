@@ -28,7 +28,7 @@ export default function PronosticsAuth() {
           telephone: form.telephone,
         });
       }
-      navigate('/pronostics');
+      navigate('/');
     } catch (err) {
       setError(err.response?.data?.error || 'Une erreur est survenue');
     } finally {
@@ -59,7 +59,7 @@ export default function PronosticsAuth() {
           </Link>
           <div style={{ fontWeight: 900, fontSize: 22, color: '#f1f5f9', letterSpacing: '-0.03em' }}>⚽ Prono <span style={{ color: '#e53e3e' }}>Sport</span></div>
           <div style={{ fontSize: 14, color: '#94a3b8', marginTop: 6 }}>
-            {mode === 'login' ? 'Connectez-vous pour accéder à vos pronostics' : '3 pronostics gratuits par jour — sans carte bancaire'}
+            {mode === 'login' ? 'Connectez-vous pour accéder à vos analyses' : '3 matchs distincts analysés par jour — sans carte bancaire'}
           </div>
         </div>
 
@@ -95,23 +95,31 @@ export default function PronosticsAuth() {
               <>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                   <div>
-                    <label style={labelStyle}>Prénom</label>
+                    <label style={labelStyle}>Prénom (facultatif)</label>
                     <input type="text" value={form.prenom} onChange={e => setForm(f => ({ ...f, prenom: e.target.value }))}
-                      required placeholder="Jean" style={inputStyle} />
+                      placeholder="Jean" style={inputStyle} />
                   </div>
                   <div>
-                    <label style={labelStyle}>Nom</label>
+                    <label style={labelStyle}>Nom (facultatif)</label>
                     <input type="text" value={form.nom} onChange={e => setForm(f => ({ ...f, nom: e.target.value }))}
-                      required placeholder="Dupont" style={inputStyle} />
+                      placeholder="Dupont" style={inputStyle} />
                   </div>
                 </div>
 
                 <div>
-                  <label style={labelStyle}>Téléphone</label>
+                  <label style={labelStyle}>Téléphone (facultatif)</label>
                   <input type="tel" value={form.telephone} onChange={e => setForm(f => ({ ...f, telephone: e.target.value }))}
-                    required placeholder="+33 6 00 00 00 00" style={inputStyle} />
+                    placeholder="+33 6 00 00 00 00" style={inputStyle} />
                 </div>
               </>
+            )}
+
+            {mode === 'register' && (
+              <div>
+                <label style={labelStyle}>Pseudonyme</label>
+                <input type="text" value={form.pseudo} onChange={e => setForm(f => ({ ...f, pseudo: e.target.value }))}
+                  required minLength={3} maxLength={20} placeholder="Votre pseudo" style={inputStyle} />
+              </div>
             )}
 
             {/* Email */}
@@ -140,7 +148,7 @@ export default function PronosticsAuth() {
             {mode === 'register' && (
               <p style={{ fontSize: 11, color: '#475569', textAlign: 'center', margin: 0, lineHeight: 1.5 }}>
                 En créant un compte, vous acceptez nos <Link to="/rgpd" style={{ color: '#5a6b60' }}>conditions d'utilisation</Link>.
-                Vos données ne sont jamais partagées.
+                Vos données sont traitées conformément à notre politique de confidentialité.
               </p>
             )}
           </form>

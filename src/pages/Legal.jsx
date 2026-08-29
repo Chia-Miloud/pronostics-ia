@@ -64,7 +64,7 @@ export function RGPD() {
   return (
     <LegalLayout title="Politique de confidentialité" subtitle="Données personnelles · RGPD">
       <InfoBox color={C.green}>
-        Dernière mise à jour : 30 juin 2026 — Conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi Informatique et Libertés.
+        Dernière mise à jour : 29 août 2026 — Conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi Informatique et Libertés.
       </InfoBox>
 
       <H2>1. Responsable du traitement</H2>
@@ -135,7 +135,7 @@ export function RGPD() {
       <P>Vous pouvez également introduire une réclamation auprès de la <strong style={{ color: C.text }}>CNIL</strong> (www.cnil.fr).</P>
 
       <H2>8. Cookies</H2>
-      <P>Le site utilise uniquement des cookies fonctionnels nécessaires au bon fonctionnement du service (authentification, session). Aucun cookie publicitaire ou de tracking tiers n'est utilisé.</P>
+      <P>Le site utilise des moyens techniques nécessaires à l’authentification et à la session, ainsi qu’une mesure d’audience interne fondée sur un identifiant de session. Les services publicitaires tiers ne doivent être activés qu’après recueil du consentement lorsque celui-ci est requis.</P>
 
       <H2>9. Sécurité</H2>
       <P>Nous mettons en œuvre des mesures techniques et organisationnelles appropriées : chiffrement HTTPS/TLS, hachage des mots de passe (bcrypt), accès restreint aux données, hébergement sécurisé en Europe.</P>
@@ -148,7 +148,7 @@ export function CGV() {
   return (
     <LegalLayout title="Conditions Générales de Vente" subtitle="CGV · Abonnements · Paiements">
       <InfoBox color={C.gold}>
-        Dernière mise à jour : 30 juin 2026 — Ces CGV régissent l'utilisation des services payants de prono-sport.io.
+        Dernière mise à jour : 29 août 2026 — Ces CGV régissent l'utilisation des services payants de prono-sport.io.
       </InfoBox>
 
       <H2>1. Éditeur du service</H2>
@@ -159,12 +159,12 @@ export function CGV() {
       </div>
 
       <H2>2. Description des services</H2>
-      <P>prono-sport.io propose des pronostics sportifs générés par intelligence artificielle pour tous les championnats et compétitions sportives. Les abonnements disponibles sont :</P>
+      <P>prono-sport.io propose des analyses et pronostics générés par intelligence artificielle pour les compétitions de football actuellement disponibles sur le service. Les abonnements présentés sont :</P>
       <div style={{ display: 'grid', gap: 12, marginBottom: 20 }}>
         {[
-          { name: 'Plan Gratuit', price: '0 €/mois', features: '1 pronostic par jour, analyse basique' },
-          { name: 'AI Plus', price: '4,99 €/mois', features: 'Pronostics illimités, score exact, analyse détaillée' },
-          { name: 'AI Premium', price: '9,99 €/mois', features: 'Tout AI Plus + Live IA Coach, questions contextuelles en temps réel' },
+          { name: 'Plan Gratuit', price: '0 €/mois', features: '3 matchs distincts analysés par jour, probabilités 1/N/2' },
+          { name: 'AI Plus', price: '4,99 €/mois', features: 'Analyses illimitées, score exact probable, analyse détaillée' },
+          { name: 'AI Premium', price: '9,99 €/mois', features: 'Tout AI Plus + Live IA Coach fondé sur le score, le statut et les données disponibles' },
         ].map(plan => (
           <div key={plan.name} style={{ background: C.bgCard, border: `1px solid ${C.border}`, borderRadius: 10, padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
             <div>
@@ -336,8 +336,8 @@ export function Contact() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {[
             { q: 'Comment annuler mon abonnement ?', r: 'Depuis votre espace client → Mes abonnements → Portail Stripe, ou en nous contactant.' },
-            { q: 'Les pronostics sont-ils garantis ?', r: 'Non. Les pronostics sont générés par IA à titre informatif. Le taux de réussite affiché est basé sur les données historiques réelles.' },
-            { q: 'Comment fonctionne le Live IA Coach ?', r: 'Disponible en plan AI Premium, il vous permet de poser des questions en temps réel sur un match en cours et d\'obtenir des analyses instantanées.' },
+            { q: 'Les pronostics sont-ils garantis ?', r: 'Non. Les pronostics sont générés par IA à titre informatif. Le bilan public reste masqué jusqu’à disposer d’un échantillon suffisant de prédictions enregistrées avant les matchs.' },
+            { q: 'Comment fonctionne le Live IA Coach ?', r: 'Disponible en plan AI Premium, il répond à vos questions à partir du score, du statut du match et des informations effectivement disponibles.' },
             { q: 'Mes données bancaires sont-elles sécurisées ?', r: 'Oui. Les paiements sont traités par Stripe (certifié PCI-DSS). Nous ne stockons jamais vos coordonnées bancaires.' },
           ].map((faq, i) => (
             <div key={i} style={{ background: C.bgCard, border: `1px solid ${C.border}`, borderRadius: 12, padding: '14px 18px' }}>

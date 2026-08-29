@@ -97,20 +97,20 @@ export function BlogList() {
             Chaque semaine, notre IA décrypte les matchs, les stats et les stratégies<br />de vos <strong style={{ color: '#ffd700' }}>compétitions préférées</strong>
           </p>
 
-          {/* Cotes décoratives */}
+          {/* Repères factuels */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: 10, flexWrap: 'wrap' }}>
             {[
-              { label: '1 Victoire', val: '2.10', color: '#4f8ef7' },
-              { label: 'N Nul', val: '3.40', color: '#ffd700' },
-              { label: '2 Défaite', val: '3.20', color: '#ff3b3b' },
+              { label: 'Offre gratuite', val: '3 matchs / jour', color: '#4f8ef7' },
+              { label: 'Périmètre actuel', val: 'Football', color: '#ffd700' },
+              { label: 'Méthode', val: 'Données disponibles', color: '#00e676' },
             ].map(o => (
               <div key={o.label} style={{
                 background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)',
                 border: `1px solid ${o.color}50`, borderRadius: 10,
-                padding: '8px 16px', textAlign: 'center', minWidth: 80,
+                padding: '8px 16px', textAlign: 'center', minWidth: 110,
               }}>
                 <div style={{ fontSize: 10, color: o.color, fontWeight: 700, textTransform: 'uppercase', marginBottom: 2 }}>{o.label}</div>
-                <div style={{ fontSize: 20, fontWeight: 900, color: o.color }}>{o.val}</div>
+                <div style={{ fontSize: 15, fontWeight: 900, color: o.color }}>{o.val}</div>
               </div>
             ))}
           </div>
@@ -163,8 +163,8 @@ export function BlogList() {
           <div style={{ position: 'relative', padding: '40px 36px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20 }}>
             <div>
               <div style={{ fontSize: 11, color: '#ff3b3b', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>🤖 Intelligence Artificielle</div>
-              <h3 style={{ fontSize: 24, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', marginBottom: 8 }}>Testez nos pronostics en temps réel</h3>
-              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', maxWidth: 400 }}>3 pronostics gratuits par jour · Score exact · Live IA Coach avec Premium</p>
+              <h3 style={{ fontSize: 24, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', marginBottom: 8 }}>Testez nos analyses de matchs</h3>
+              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', maxWidth: 400 }}>3 matchs distincts analysés par jour · Fonctions avancées selon le plan</p>
             </div>
             <button onClick={() => navigate('/')} style={{
               background: 'linear-gradient(135deg, #ff3b3b, #c62828)',
@@ -405,8 +405,8 @@ export function BlogArticle() {
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(255,59,59,0.25), rgba(10,12,20,0.8))' }} />
           <div style={{ position: 'relative', padding: '24px 28px', display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
             <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 900, color: '#fff', fontSize: 17, marginBottom: 6 }}>🤖 Pronostics IA en direct</div>
-              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>1 gratuit/jour · Score exact + Live Coach avec Premium</div>
+              <div style={{ fontWeight: 900, color: '#fff', fontSize: 17, marginBottom: 6 }}>🤖 Analyses de matchs par IA</div>
+              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>3 matchs distincts gratuits/jour · Fonctions avancées selon le plan</div>
             </div>
             <button onClick={() => navigate('/')} style={{ background: 'linear-gradient(135deg, #ff3b3b, #c62828)', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 24px', fontWeight: 900, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 16px rgba(255,59,59,0.35)', whiteSpace: 'nowrap' }}>
               Voir les matchs →

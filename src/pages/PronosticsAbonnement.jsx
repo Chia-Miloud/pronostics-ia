@@ -10,10 +10,10 @@ const plans = [
     id: 'free', label: 'Free', emoji: '🆓', price: '0€', period: '/mois',
     border: 'rgba(255,255,255,0.12)', bg: '#111827', btnBg: '#1f2937', btnColor: '#f1f5f9',
     features: [
-      { text: '3 pronostics IA par jour', ok: true },
+      { text: '3 matchs distincts analysés par jour', ok: true },
       { text: 'Favori du match', ok: true },
       { text: 'Score de confiance', ok: true },
-      { text: 'Classement public', ok: true },
+      { text: 'Bilan vérifié dès échantillon suffisant', ok: true },
       { text: 'Analyse IA détaillée', ok: false },
       { text: 'Score exact probable', ok: false },
       { text: 'TrapScore', ok: false },
@@ -26,11 +26,11 @@ const plans = [
     border: '#22c55e', bg: '#10231b', btnBg: '#16a34a', btnColor: '#fff',
     badge: 'Populaire', badgeBg: '#2f8553',
     features: [
-      { text: 'Pronostics illimités', ok: true },
+      { text: 'Analyses de matchs illimitées', ok: true },
       { text: 'Analyse IA détaillée', ok: true },
       { text: 'Score exact probable', ok: true },
       { text: 'TrapScore (risque de surprise)', ok: true },
-      { text: 'Alertes avant les matchs', ok: true },
+      { text: 'Probabilités 1/N/2', ok: true },
       { text: 'Sans publicité', ok: true },
       { text: 'Live IA Coach', ok: false },
       { text: 'Simulations de compétition', ok: false },
@@ -45,9 +45,9 @@ const plans = [
       { text: 'Tout AI Plus inclus', ok: true },
       { text: '🔴 Live IA Coach', ok: true, highlight: true },
       { text: 'Questions contextuelles en direct', ok: true, highlight: true },
-      { text: 'Score évolutif en temps réel', ok: true, highlight: true },
-      { text: 'Simulations de compétition', ok: true },
-      { text: 'Analyse blessures et suspensions', ok: true },
+      { text: 'Lecture du score et du statut disponibles', ok: true, highlight: true },
+      { text: 'Simulations de compétition', ok: false },
+      { text: 'Blessures et suspensions sans source dédiée', ok: false },
       { text: 'Badge Premium 👑', ok: true },
       { text: 'Accès anticipé aux nouveautés', ok: true },
     ],
@@ -95,7 +95,7 @@ export default function PronosticsAbonnement() {
           <h1 style={{ fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 900, letterSpacing: '-0.03em', marginBottom: 12 }}>
             Choisissez votre plan
           </h1>
-          <p style={{ fontSize: 16, color: '#b0bec5' }}>Analysez chaque match avec l'IA. Commencez avec 3 pronostics gratuits par jour.</p>
+          <p style={{ fontSize: 16, color: '#b0bec5' }}>Analysez jusqu’à 3 matchs distincts par jour gratuitement. Une réouverture ne consomme pas de crédit supplémentaire.</p>
         </div>
 
         {error && (
@@ -187,7 +187,7 @@ export default function PronosticsAbonnement() {
           <div style={{ fontSize: 36, marginBottom: 12 }}>🔴</div>
           <h2 style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-0.02em', marginBottom: 10 }}>Live IA Coach — La killer feature</h2>
           <p style={{ fontSize: 15, color: '#b0bec5', lineHeight: 1.7, maxWidth: 560, margin: '0 auto' }}>
-            Pendant le match, posez vos questions à l'IA en temps réel. Elle analyse les stats live et prédit les prochains événements. Score évolutif recalculé à chaque minute.
+            Pendant le match, posez vos questions à l’IA. Elle s’appuie sur le score, le statut et les informations disponibles, et signale clairement toute donnée manquante.
           </p>
         </div>
 

@@ -494,7 +494,7 @@ export function MatchPage() {
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, transparent, #8b5cf6, #fbbf24, #8b5cf6, transparent)', animation: 'shimmer 2s ease-in-out infinite' }} />
             <div style={{ fontSize: 40, animation: 'spin 3s linear infinite', display: 'inline-block', marginBottom: 12 }}>⚽</div>
             <div style={{ fontSize: 16, fontWeight: 900, color: C.text, marginBottom: 6 }}>ANALYSE EN COURS</div>
-            <div style={{ fontSize: 12, color: C.textSub }}>Intelligence artificielle · Données temps réel · 6 paramètres</div>
+            <div style={{ fontSize: 12, color: C.textSub }}>Intelligence artificielle · Données disponibles · Analyse factuelle</div>
             <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}} @keyframes shimmer{0%,100%{opacity:0.5}50%{opacity:1}}`}</style>
           </div>
         ) : pronostic ? (

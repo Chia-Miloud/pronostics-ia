@@ -90,7 +90,7 @@ export default function Dashboard() {
 // ─── ONGLET TABLEAU DE BORD ───────────────────────────────────────────────────
 function DashboardTab({ data, plan, navigate }) {
   const quota = data?.quota;
-  const QUOTA_MAX = plan === 'free' ? 1 : '∞';
+  const QUOTA_MAX = plan === 'free' ? 3 : '∞';
   const planColor = PLAN_COLORS[plan] || C.textDim;
 
   return (
@@ -114,7 +114,7 @@ function DashboardTab({ data, plan, navigate }) {
       {plan === 'free' && (
         <div style={{ background: `linear-gradient(135deg, ${C.accent}15, ${C.gold}10)`, border: `1px solid ${C.accent}30`, borderRadius: 14, padding: 20 }}>
           <div style={{ fontWeight: 800, color: C.text, marginBottom: 4 }}>🚀 Passez à AI Plus ou Premium</div>
-          <div style={{ fontSize: 13, color: C.textSub, marginBottom: 12 }}>Pronostics illimités + score exact + buteurs potentiels + cotes bookmakers</div>
+          <div style={{ fontSize: 13, color: C.textSub, marginBottom: 12 }}>Analyses illimitées + score exact probable + explication détaillée</div>
           <button onClick={() => navigate('/abonnement')} style={{ background: `linear-gradient(135deg, ${C.accent}, #c62828)`, color: '#fff', border: 'none', borderRadius: 10, padding: '10px 20px', fontWeight: 900, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>
             Voir les plans →
           </button>
@@ -227,12 +227,12 @@ function SubscriptionTab({ plan, pronosticsApi, navigate }) {
   const PLANS = [
     {
       id: 'free', label: 'Gratuit', price: '0€', color: C.textDim,
-      features: ['1 pronostic / jour', 'Probabilités 1/N/2', 'Bilan des résultats'],
+      features: ['3 matchs distincts / jour', 'Probabilités 1/N/2', 'Bilan vérifié dès échantillon suffisant'],
       current: plan === 'free',
     },
     {
       id: 'ai_plus', label: '🚀 AI Plus', price: '4,99€/mois', color: C.gold,
-      features: ['Pronostics illimités', 'Score exact prédit', 'Buteurs potentiels', 'Cotes bookmakers', 'Analyse détaillée'],
+      features: ['Analyses illimitées', 'Score exact probable', 'Probabilités 1/N/2', 'Analyse détaillée'],
       current: plan === 'ai_plus',
       upgrade: plan === 'free',
       downgrade: plan === 'ai_premium',

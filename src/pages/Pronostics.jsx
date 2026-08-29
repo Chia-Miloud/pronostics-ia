@@ -28,12 +28,12 @@ const C = {
 
 // ─── ÉTAPES ANIMATION ────────────────────────────────────────────────────────
 const STEPS = [
-  { icon: '⚡', label: 'Forme récente des équipes',      color: C.gold,   duration: 1100 },
-  { icon: '🏥', label: 'Blessés & suspendus',            color: C.accent, duration: 1300 },
-  { icon: '📊', label: 'Classement FIFA & statistiques', color: C.blue,   duration: 1500 },
-  { icon: '🔥', label: 'Confrontations directes H2H',    color: C.orange, duration: 1100 },
-  { icon: '🌡️', label: 'Conditions & enjeux du match',   color: C.purple, duration: 1200 },
-  { icon: '🧠', label: 'Génération du pronostic IA',     color: C.green,  duration: 1200 },
+  { icon: '⚡', label: 'Forme récente disponible',        color: C.gold,   duration: 1100 },
+  { icon: '📅', label: 'Calendrier et contexte du match', color: C.accent, duration: 1300 },
+  { icon: '📊', label: 'Résultats et buts disponibles',   color: C.blue,   duration: 1500 },
+  { icon: '🔥', label: 'Confrontations directes disponibles', color: C.orange, duration: 1100 },
+  { icon: '🏆', label: 'Compétition et phase du match',   color: C.purple, duration: 1200 },
+  { icon: '🧠', label: 'Génération du pronostic IA',      color: C.green,  duration: 1200 },
 ];
 
 // ─── ANIMATION ────────────────────────────────────────────────────────────────
@@ -192,8 +192,8 @@ function PaywallModal({ onClose }) {
           Votre pronostic est prêt !
         </h2>
         <p style={{ fontSize: 14, color: C.textSub, marginBottom: 24, lineHeight: 1.6 }}>
-          Vous avez utilisé votre pronostic gratuit du jour.<br />
-          Passez à <strong style={{ color: C.gold }}>AI Plus</strong> pour des pronostics illimités.
+          Vous avez utilisé vos 3 analyses de matchs distincts gratuites aujourd’hui.<br />
+          Passez à <strong style={{ color: C.gold }}>AI Plus</strong> pour des analyses illimitées.
         </p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
@@ -203,7 +203,7 @@ function PaywallModal({ onClose }) {
             fontSize: 15, fontWeight: 900, textDecoration: 'none',
             display: 'block', boxShadow: `0 4px 20px ${C.goldGlow}`,
           }}>
-            🚀 AI Plus — 4,99€/mois · Pronostics illimités
+            🚀 AI Plus — 4,99€/mois · Analyses illimitées
           </Link>
           <Link to="/abonnement" style={{
             background: `linear-gradient(135deg, ${C.accent}, #c62828)`,
@@ -219,7 +219,7 @@ function PaywallModal({ onClose }) {
           background: 'none', border: 'none', color: C.textDim,
           cursor: 'pointer', fontSize: 12, textDecoration: 'underline'
         }}>
-          Revenir demain pour mon pronostic gratuit
+          Revenir demain pour mes analyses gratuites
         </button>
       </div>
     </div>
@@ -923,8 +923,8 @@ export default function Pronostics() {
           </h1>
 
           <p style={{ fontSize: 15, color: C.textSub, lineHeight: 1.7, marginBottom: 22 }}>
-            Notre IA analyse la forme, les blessés, les stats et l'historique<br />
-            pour chaque match — en temps réel.
+            Notre IA analyse la forme, les résultats et l’historique disponibles<br />
+            pour chaque match, sans inventer les données manquantes.
           </p>
 
           <div style={{
@@ -933,7 +933,7 @@ export default function Pronostics() {
             borderRadius: 20, padding: '8px 18px', marginBottom: 24,
             fontSize: 13, fontWeight: 800, color: C.green
           }}>
-            ✓ 1 pronostic gratuit par jour · Sans carte bancaire
+            ✓ 3 matchs distincts analysés par jour · Sans carte bancaire
           </div>
 
           {!user && (
